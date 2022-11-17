@@ -1,4 +1,4 @@
-# Teamway API Demo
+# Teamway API
 
 Build a REST application from scratch that could serve as a work planning service.
 
