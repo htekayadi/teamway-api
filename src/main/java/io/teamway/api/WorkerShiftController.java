@@ -26,7 +26,8 @@ public class WorkerShiftController {
     }
 
     @PostMapping
-    public WorkerShiftResponseDto addShift(@RequestBody WorkerShiftDto requestBody) throws ShiftAlreadyExistsException {
+    public WorkerShiftResponseDto addShift(@RequestBody WorkerShiftDto requestBody)
+            throws ShiftAlreadyExistsException, ResourceNotFoundException {
         return shiftHistoryService.addShift(requestBody);
     }
 

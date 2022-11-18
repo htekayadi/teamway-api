@@ -6,7 +6,9 @@ import io.teamway.exceptions.ResourceNotFoundException;
 import io.teamway.exceptions.ShiftAlreadyExistsException;
 import io.teamway.model.ShiftHistory;
 import io.teamway.model.ShiftType;
+import io.teamway.model.Worker;
 import io.teamway.repository.ShiftHistoryRepository;
+import io.teamway.repository.WorkerRepository;
 import io.teamway.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,12 @@ public class ShiftHistoryService {
 
     private final ShiftHistoryRepository shiftHistoryRepository;
 
+    private final WorkerRepository workerRepository;
+
     @Autowired
-    public ShiftHistoryService(ShiftHistoryRepository shiftHistoryRepository) {
+    public ShiftHistoryService(ShiftHistoryRepository shiftHistoryRepository, WorkerRepository workerRepository) {
         this.shiftHistoryRepository = shiftHistoryRepository;
+        this.workerRepository = workerRepository;
     }
 
     @Transactional(propagation = REQUIRES_NEW)
@@ -52,7 +57,13 @@ public class ShiftHistoryService {
     }
 
     @Transactional(propagation = REQUIRES_NEW)
-    public WorkerShiftResponseDto addShift(WorkerShiftDto workerShiftDto) throws ShiftAlreadyExistsException {
+    public WorkerShiftResponseDto addShift(WorkerShiftDto workerShiftDto) throws ShiftAlreadyExistsException, ResourceNotFoundException {
+        Optional<Worker> worker = workerRepository.findById(workerShiftDto.getWorkerId());
+
+        if(worker.isEmpty()) {
+            throw new ResourceNotFoundException("Worker not found!");
+        }
+
         Optional<ShiftHistory> shift = shiftHistoryRepository.findOneByWorkerIdAndWorkedDate(workerShiftDto.getWorkerId(), LocalDate.parse(workerShiftDto.getShiftDate(), DATE_FORMATTER));
 
         if(shift.isPresent()) {
